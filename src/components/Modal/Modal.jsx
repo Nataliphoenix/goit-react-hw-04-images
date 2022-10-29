@@ -7,18 +7,18 @@ export class Modal extends Component {
         window.addEventListener('keydown', this.closeModal);
         window.addEventListener('scroll', this.noScrollBody)
       }
-    
+
       componentWillUnmount() {
         window.removeEventListener('keydown', this.closeModal);
         window.removeEventListener('scroll', this.noScrollBody)
       }
-    
+
       closeModal = e => {
         if (e.code === 'Escape') {
           this.props.onClose();
         }
       };
-    
+
       clickOverlay = e => {
         if (e.target.nodeName !== 'IMG') {
           this.props.onClose();
@@ -29,10 +29,10 @@ export class Modal extends Component {
         window.scrollTo(0,0);
       }
 
-      
+
       render() {
         const { largeImage } = this.props;
-    
+
             return (
           <Overley onClick={this.clickOverlay}>
             <ModalImg>
@@ -43,7 +43,6 @@ export class Modal extends Component {
         }
         }
         
-    
     Modal.propTypes = {
         largeImage: PropTypes.string.isRequired,
         onClose: PropTypes.func.isRequired,
