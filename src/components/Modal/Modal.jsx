@@ -5,12 +5,12 @@ import PropTypes from 'prop-types';
 export class Modal extends Component {
     componentDidMount() {
         window.addEventListener('keydown', this.closeModal);
-        window.addEventListener('scroll', this.noScrollBody)
+        document.body.style.overflow = "hidden";
       }
 
       componentWillUnmount() {
         window.removeEventListener('keydown', this.closeModal);
-        window.removeEventListener('scroll', this.noScrollBody)
+        document.body.style.overflow = "";
       }
 
       closeModal = e => {
@@ -24,11 +24,6 @@ export class Modal extends Component {
           this.props.onClose();
         }
       };
-
-      noScrollBody = e => {
-        window.scrollTo(0,0);
-      }
-
 
       render() {
         const { largeImage } = this.props;

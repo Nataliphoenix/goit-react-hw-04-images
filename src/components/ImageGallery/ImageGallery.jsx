@@ -18,13 +18,13 @@ export const ImageGallery = ({ hits, onClick }) => {
   };
 
 
-    ImageGallery.propTypes = {
-        hits: PropTypes.arrayOf(
-          PropTypes.shape({
-            id: PropTypes.number.isRequired,
-            webformatURL: PropTypes.string.isRequired,
-            largeImageURL: PropTypes.string.isRequired,
-          }),
-        ),
-        onClick: PropTypes.func.isRequired,
-    }
+  ImageGallery.propTypes = {
+      hits: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.number,
+          webformatURL: PropTypes.string,
+          largeImageURL: PropTypes.string,
+        }).isRequired,
+      ),
+      onClick: PropTypes.func.isRequired,
+  }
