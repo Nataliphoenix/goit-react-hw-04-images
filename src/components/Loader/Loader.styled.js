@@ -1,5 +1,5 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
-export const DnaContainer = styled.div`
-text-align: center;
+export const ColorRingContainer = styled.div`
+  text-align: center;
 `;

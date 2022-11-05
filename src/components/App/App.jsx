@@ -1,6 +1,5 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { fetchSearchWord } from 'api';
 import { Searchbar } from 'components/Searchbar/Searchbar';
 import { ImageGallery } from 'components/ImageGallery/ImageGallery';
@@ -9,31 +8,31 @@ import { Loader } from 'components/Loader/Loader';
 import { Modal } from 'components/Modal/Modal';
 import { Button } from 'components/Button/Button';
 
-export class App extends Component {
-  state = {
-    searchWord: '',
-    hits: [],
-    page: 1,
-    status: 'idle',
-    modalImage: null,
-  };
+export function App() {
+  const [searchWord, setSearchWord] = useState('');
+  const [hits, setHits] = useState([]);
+  const [page, setPage] = useState(1);
+  const [status, setStatus] = useState('idle');
+  const [showModal, setShowModal] = useState(false);
+  const [largeImageModal, setLargeImageModal] = useState(null);
 
-  async componentDidUpdate(_, prevState) {
-    const prevSearchWord = prevState.searchWord;
-    const nextSearchWord = this.state.searchWord;
-    const prevPage = prevState.page;
-    const nextPage = this.state.page;
+  useEffect(() => {
+    if (!searchWord) {
+      return;
+    }
 
-    if (prevSearchWord !== nextSearchWord || prevPage !== nextPage) {
-      this.setState({ status: 'pending' });
+    const controller = new AbortController();
+
+    async function changeFetchSearchWord() {
+      setStatus('pending');
 
       try {
-        const articles = await fetchSearchWord(nextSearchWord, nextPage);
+        const articles = await fetchSearchWord(searchWord, page, {
+          signal: controller.signal,
+        });
 
-        this.setState(prevState => ({
-          hits: [...prevState.hits, ...articles.hits],
-          status: 'resolved',
-        }));
+        setHits(prevState => [...prevState, ...articles.hits]);
+        setStatus('resolved');
 
         if (articles.hits.length === 0) {
           toast.error(
@@ -41,60 +40,55 @@ export class App extends Component {
           );
         }
 
-        if (articles.hits.length > 0 && this.state.page === 1) {
+        if (articles.hits.length > 0 && page === 1) {
           toast.success(`Hooray! We found ${articles.total} images.`);
         }
       } catch (error) {
         toast.error('Something went wrong. Please, reload the page.');
+        setStatus('rejected');
       } finally {
-        this.setState({ status: 'resolved' });
+        setStatus('resolved');
       }
     }
-  }
 
-  handleFormSubmit = searchWord => {
-    this.setState({
-      searchWord,
-      page: 1,
-      hits: [],
-    });
+    changeFetchSearchWord();
+
+    return () => {
+      controller.abort();
+    };
+  }, [searchWord, page]);
+
+  const handleFormSubmit = searchWord => {
+    setSearchWord(searchWord);
+    setPage(1);
+    setHits([]);
   };
 
-  loadMore = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
+  const toggleModal = largeImageURL => {
+    setShowModal(showModal => !showModal);
+    setLargeImageModal(largeImageURL);
   };
 
-  openModal = imageUrl => {
-    this.setState({ modalImage: imageUrl });
-  };
+  return (
+    <Wrapper>
+      <Searchbar onSubmit={handleFormSubmit} />
+      {hits.length > 0 && <ImageGallery hits={hits} onClick={toggleModal} />}
 
-  closeModal = e => {
-    this.setState({ modalImage: null });
-  };
+      {status === 'pending' && <Loader />}
 
-  render() {
-    const { status, hits, modalImage } = this.state;
+      {hits.length > 0 && hits.length >= 12 && status === 'resolved' && (
+        <Button onClick={() => setPage(prevState => prevState + 1)}>
+          Load more ...
+        </Button>
+      )}
 
-    return (
-      <Wrapper>
-        <Searchbar onSubmit={this.handleFormSubmit} />
-        {hits.length > 0 && (
-          <ImageGallery hits={hits} onClick={this.openModal} />
-        )}
-        {status === 'pending' && <Loader />}
+      {showModal && (
+        <Modal onClose={toggleModal}>
+          <img src={largeImageModal} alt="" />
+        </Modal>
+      )}
 
-        {hits.length > 0 && status === 'resolved' && (
-          <Button onClick={this.loadMore}> Load more ... </Button>
-        )}
-
-        {modalImage && (
-          <Modal largeImage={modalImage} onClose={this.closeModal} />
-        )}
-
-        <ToastContainer position="top-right" autoClose={3000} />
-      </Wrapper>
-    );
-  }
+      <ToastContainer position="top-right" autoClose={3000} />
+    </Wrapper>
+  );
 }

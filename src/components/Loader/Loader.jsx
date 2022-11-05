@@ -1,22 +1,21 @@
-import {Component} from 'react';
-import {Dna} from 'react-loader-spinner'
-import {DnaContainer} from './Loader.styled'
+import { Component } from 'react';
+import { ColorRing } from 'react-loader-spinner';
+import { ColorRingContainer } from './Loader.styled';
 
 export class Loader extends Component {
-    render() {
-        return (
-            <DnaContainer>
-                <Dna
-                visible={true}
-                height="120"
-                width="120"
-                ariaLabel="dna-loading"
-                wrapperStyle={{}}
-                wrapperClass="dna-wrapper"
-                alignItem="center"
-                />
-            </DnaContainer>
-            
-        )
-    }  
+  render() {
+    return (
+      <ColorRingContainer>
+        <ColorRing
+          visible={true}
+          height="160"
+          width="160"
+          ariaLabel="blocks-loading"
+          wrapperStyle={{}}
+          wrapperClass="blocks-wrapper"
+          colors={['#e15b64', '#f47e60', '#f8b26a', '#abbd81', '#849b87']}
+        />
+      </ColorRingContainer>
+    );
+  }
 }

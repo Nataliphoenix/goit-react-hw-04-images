@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { Component } from 'react';
+import { useState } from 'react';
 import {
   SearchForm,
   Wrapper,
@@ -9,47 +9,41 @@ import {
 } from 'components/Searchbar/Searchbar.styled';
 import { toast } from 'react-toastify';
 
-export class Searchbar extends Component {
-  state = {
-    searchWord: '',
+export function Searchbar({ onSubmit }) {
+  const [searchWord, setSarchWord] = useState('');
+
+  const handleSearchWord = e => {
+    setSarchWord(e.currentTarget.value.toLowerCase());
   };
 
-  handleSearchWord = e => {
-    this.setState({
-      searchWord: e.currentTarget.value.toLowerCase(),
-    });
-  };
-
-  handleSearchSubmit = e => {
+  const handleSearchSubmit = e => {
     e.preventDefault();
-    if (this.state.searchWord.trim() === '') {
+    if (searchWord.trim() === '') {
       toast.error('Please, enter your search word!');
       return;
     }
-    this.props.onSubmit(this.state.searchWord);
-    this.setState({ searchWord: '' });
+    onSubmit(searchWord);
+    setSarchWord('');
   };
 
-  render() {
-    return (
-      <Wrapper>
-        <SearchForm onSubmit={this.handleSearchSubmit}>
-          <SearchFormInput
-            type="text"
-            autoComplete="off"
-            autoFocus
-            placeholder="Search images and photos"
-            value={this.state.searchWord}
-            onChange={this.handleSearchWord}
-          />
+  return (
+    <Wrapper>
+      <SearchForm onSubmit={handleSearchSubmit}>
+        <SearchFormInput
+          type="text"
+          autoComplete="off"
+          autoFocus
+          placeholder="Search images and photos"
+          value={searchWord}
+          onChange={handleSearchWord}
+        />
 
-          <SearchFormButton type="submit">
-            <SearchFormButtonLabel> Search</SearchFormButtonLabel>
-          </SearchFormButton>
-        </SearchForm>
-      </Wrapper>
-    );
-  }
+        <SearchFormButton type="submit">
+          <SearchFormButtonLabel> Search</SearchFormButtonLabel>
+        </SearchFormButton>
+      </SearchForm>
+    </Wrapper>
+  );
 }
 
 Searchbar.propTypes = {
